@@ -5,7 +5,7 @@ CFLAGS=-I$(IDIR) -Wall -ggdb
 ODIR=.
 LDIR =.
 
-LIBS=-lm -framework CoreFoundation
+LIBS=-lm -lcrypto -framework CoreFoundation
 
 _DEPS = radat.h
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))

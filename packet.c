@@ -2,7 +2,7 @@
 #include <arpa/inet.h>
 #include <stdlib.h>
 #include <time.h>
-
+#include <openssl/evp.h>
 
 #include "radat.h"
 
@@ -27,6 +27,31 @@ void setup_header(BYTE code, BYTE ident)
   len = pack_curr - packet;
   p_hdr->len[0] = (len & 0xFF00) >> 8; 
   p_hdr->len[1] = len & 0xFF; 
+}
+
+char *calc_user_passw(char *secret, char *password)
+{
+  EVP_MD_CTX mdctx;
+  const EVP_MD *md;
+  unsigned char md_value[EVP_MAX_MD_SIZE];
+  int i;
+  unsigned int md_len;
+
+  OpenSSL_add_all_digests();
+
+  md = EVP_get_digestbyname("MD5");
+
+  EVP_MD_CTX_init(&mdctx);
+  EVP_DigestInit_ex(&mdctx, md, NULL);
+  EVP_DigestUpdate(&mdctx, secret, strlen(secret));
+  EVP_DigestFinal_ex(&mdctx, md_value, &md_len);
+  EVP_MD_CTX_cleanup(&mdctx);
+
+  printf("Digest is: ");
+  for(i = 0; i < md_len; i++) printf("%02x", md_value[i]);
+  printf("\n");
+
+  return NULL;
 }
 
 void incr_ident(void)
